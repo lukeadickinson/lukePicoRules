@@ -6,19 +6,20 @@ A first ruleset for the Quickstart
 >> 
     author "Luke Dickinson"
     logging on
-    shares hello, name, __testing
+    shares hello, __testing
   }
   
   global {
-    hello = function(obj) {
+    helloFake = function(obj) {
       msg = "Hello " + obj;
       msg
     }
-    __testing = { "queries": [ { "name": "hello", "args": [ "obj" ] },
-                            { "name": "setName", "args": [ "name" ] },
+    __testing = { "queries": [ { "name": "helloFake", "args": [ "obj" ] },
                            { "name": "__testing" } ],
-                           
-              "events": [ { "domain": "echo", "type": "hello" , "attrs": [ "name" ]} ]
+                
+              "events": [ { "domain": "echo", "type": "hello" , "attrs": [ "attr_name" ]},
+                          { "domain": "save", "type": "name" , "attrs": [ "attr_name" ]} 
+                        ]
     }
 
   }
@@ -26,21 +27,21 @@ A first ruleset for the Quickstart
   rule hello_world {
     select when echo hello
     pre{
-        name = event:attr("name").defaultsTo(ent:name,"use stored name")
+        passed_name = event:attr("attr_name").defaultsTo(ent:myName,"use stored name")
     }
     send_directive("say") with
-      something = "Hello World" + name
+      something = "Hello World " + passed_name
   }
 
  rule store_name {
-    select when hello setName
+    select when save name
     pre{
-        passed_name = event:attr("name").klog("our passed in name: ")
+        passed_name = event:attr("attr_name").klog("our passed in name: ")
     }
     send_directive("store_name") with
-        name = passed_name
+        options_name = passed_name
     always{
-        ent:name := passed_name
+        ent:myName := passed_name
     }
   }
 }
