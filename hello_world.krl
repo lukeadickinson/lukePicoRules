@@ -24,18 +24,33 @@ A first ruleset for the Quickstart
     }
     clear_name = { "_0": { "name": { "first": "GlaDOS", "last": "" } } }
 
+    name = function(id){
+    all_users = users();
+    nameObj = id => all_users{[id,"name"]}
+                    | { "first": "HAL", "last": "9000" };
+    first = nameObj{"first"};
+    last = nameObj{"last"};
+    first + " " + last
+    }
+    
+    users = function(){
+        ent:myName
+    }
   }
   
   rule hello_world {
     select when echo hello
     pre{
         id = event:attr("id").defaultsTo("_0")
-        first = ent:myName{[id,"name","first"]}
-        last = ent:myName{[id,"name","last"]}
-        passed_name = first + " " + last
+        passed_name = name(id)
+        visits = ent:myName{[id,"visits"]}
     }
     send_directive("say") with
       something = "Hello World " + passed_name
+    
+    fired {
+    ent:myName{[id,"visits"]} := visits + 1
+    }
   }
 
  rule store_name {
