@@ -6,7 +6,7 @@ A first ruleset for the Quickstart
 >> 
     author "Luke Dickinson"
     logging on
-    shares hello, functionName, __testing
+    shares hello, name, __testing
   }
   
   global {
@@ -16,7 +16,7 @@ A first ruleset for the Quickstart
     }
     __testing = { "queries": [ { "name": "hello", "args": [ "obj" ] },
                            { "name": "__testing" } ],
-              "events": [ { "domain": "echo", "type": "hello" , "attrs": [ "attName" ]} ]
+              "events": [ { "domain": "echo", "type": "hello" , "attrs": [ "name" ]} ]
     }
 
   }
@@ -24,21 +24,21 @@ A first ruleset for the Quickstart
   rule hello_world {
     select when echo hello
     pre{
-        localName = event:attr("attName").defaultsTo(ent:entity_name,"use stored name")
+        name = event:attr("name").defaultsTo(ent:name,"use stored name")
     }
     send_directive("say") with
-      something = "Hello World" + localName
+      something = "Hello World" + name
   }
 
-  rule store_name {
-    select when hello functionName
+ rule store_name {
+    select when hello name
     pre{
-        localName = event:attr("attName").klog("our passed in name: ")
+        name = event:attr("name").klog("our passed in name: ")
     }
     send_directive("store_name") with
-        optionsName = localName
+        name = name
     always{
-        ent:entityName := localName
+        ent:name := name
     }
   }
 }
