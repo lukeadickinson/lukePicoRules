@@ -22,7 +22,7 @@ ruleset track_trips{
     rule process_trip{
     select when echo message
     pre{
-        messageInput = event:attr("input").klog("our passed in input: ")
+        messageInput = event:attr("mileage").klog("our passed in input: ")
     }
     send_directive("say") with
         trip_length = returnMessage(messageInput)
