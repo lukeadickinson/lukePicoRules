@@ -15,7 +15,9 @@ A first ruleset for the Quickstart
       msg
     }
     __testing = { "queries": [ { "name": "hello", "args": [ "obj" ] },
+                            { "name": "setName", "args": [ "name" ] },
                            { "name": "__testing" } ],
+                           
               "events": [ { "domain": "echo", "type": "hello" , "attrs": [ "name" ]} ]
     }
 
@@ -31,14 +33,14 @@ A first ruleset for the Quickstart
   }
 
  rule store_name {
-    select when hello name
+    select when hello setName
     pre{
-        name = event:attr("name").klog("our passed in name: ")
+        passed_name = event:attr("name").klog("our passed in name: ")
     }
     send_directive("store_name") with
-        name = name
+        name = passed_name
     always{
-        ent:name := name
+        ent:name := passed_name
     }
   }
 }
