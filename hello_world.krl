@@ -3,7 +3,7 @@ ruleset hello_world {
     name "Hello World"
     description <<
 A first ruleset for the Quickstart
->>
+>> 
     author "Luke Dickinson"
     logging on
     shares hello, functionName, __testing
