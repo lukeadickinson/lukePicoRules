@@ -4,9 +4,9 @@ ruleset hello_world {
     description <<
 A first ruleset for the Quickstart
 >>
-    author "Phil Windley"
+    author "Luke Dickinson"
     logging on
-    shares hello
+    shares hello, __testing
   }
   
   global {
@@ -14,6 +14,11 @@ A first ruleset for the Quickstart
       msg = "Hello " + obj;
       msg
     }
+    __testing = { "queries": [ { "name": "hello", "args": [ "obj" ] },
+                           { "name": "__testing" } ],
+              "events": [ { "domain": "echo", "type": "hello" } ]
+    }
+
   }
   
   rule hello_world {
