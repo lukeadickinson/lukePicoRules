@@ -6,7 +6,7 @@ A first ruleset for the Quickstart
 >> 
     author "Luke Dickinson"
     logging on
-    shares hello, functionName, __testing
+    shares hello, functionName, __testing 
   }
   
   global {
