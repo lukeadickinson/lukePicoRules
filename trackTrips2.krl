@@ -41,11 +41,6 @@ ruleset track_trips2{
         fired{
             raise explicit event "found_long_trip"
             attributes event:attr()
-            if 10 > 6
-        }
-        else
-        {
-            longTrip.klog("not fired")
         }
     }
 
