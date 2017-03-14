@@ -51,10 +51,5 @@ ruleset track_trips2{
             }
     }
 
-    rule found_long_trips{
-        select when explicit found_long_trip
-        send_directive("say") with
-            message = returnMessage("found_long_trips")
-    }
 
 }
