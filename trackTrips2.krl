@@ -39,7 +39,7 @@ ruleset track_trips2{
             longTrip = 10
             messageAsNumber = messageInput.as("Number")
         }
-        if messageAsNumber > longTrip then
+        if 10 >= 55 then
             noop()
 
         fired{
