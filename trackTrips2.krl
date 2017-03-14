@@ -14,7 +14,8 @@ ruleset track_trips2{
     __testing = { "queries": [ { "name": "returnMessage", "args": [ "message" ] },
                            { "name": "__testing" } ],
                 
-              "events": [ { "domain": "echo", "type": "message" , "attrs": [ "mileage"]}
+              "events": [ { "domain": "echo", "type": "message" , "attrs": [ "mileage"]},
+                          { "domain": "explicit", "type": "trip_processed" , "attrs": [ "mileage"]}
                         ]
     }
   }
@@ -30,24 +31,30 @@ ruleset track_trips2{
         
         fired{
             raise explicit event "trip_processed"
-            attributes event:attr()
+            attributes {"mileage":messageInput}
         }
     }
     rule find_long_trips{
         select when explicit trip_processed
         pre{
+            messageInput = event:attr("mileage").klog("our passed in input: ")
             longTrip = 10
+            messageAsNumber = messageInput.as("Number")
         }
+        send_directive("say") with
+            message = returnMessage("find_long_trips")
+
         fired{
-            raise explicit event "found_long_trip"
-            attributes event:attr()
-        }
+                raise explicit event "found_long_trip"
+                attributes {}
+                if messageAsNumber > longTrip
+            }
     }
 
     rule found_long_trips{
         select when explicit found_long_trip
         send_directive("say") with
-            message = returnMessage("moo")
+            message = returnMessage("found_long_trips")
     }
 
 }
