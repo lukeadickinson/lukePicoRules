@@ -48,4 +48,11 @@ ruleset track_trips2{
             longTrip.klog("not fired")
         }
     }
+
+    rule found_long_trips{
+        select when explicit found_long_trip
+        send_directive("say") with
+            message = returnMessage("moo")
+    }
+
 }
