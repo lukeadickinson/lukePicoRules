@@ -2,6 +2,7 @@ ruleset track_trips2{
   meta {
     name "track_trips2"
     author "Luke Dickinson"
+    logging on
     shares returnMessage, __testing
   }
   
@@ -35,21 +36,16 @@ ruleset track_trips2{
     rule find_long_trips{
         select when explicit trip_processed
         pre{
-            messageInput = event:attr("mileage").klog("our passed in input: ")
             longTrip = 10
-            messageAsNumber = messageInput.as("Number")
         }
-        if 10 >= 55 then
-            noop()
-
         fired{
             raise explicit event "found_long_trip"
             attributes event:attr()
+            if 10 > 6
         }
         else
         {
-            raise explicit event "found_long_trip"
-            attributes event:attr()
+            longTrip.klog("not fired")
         }
     }
 }
