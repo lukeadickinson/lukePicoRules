@@ -23,12 +23,26 @@ ruleset trip_store{
 
     short_trips = function()
     {
-
+        allTrips = ent:trip;
+        longTrips = ent:longTrip;
+        shortTrips = {};
+        shortTripskeys = allTrips.keys().difference(longTrips.keys());
+        shortTrips = allTrips.filter(function(v,k){
+            shortTripskeys.any(function(shortKey){
+                k.as("Number")== shortKey.as("Number")
+                })
+           });
+        //foreach shortTripskeys setting (shortKey){
+        //    shortTrips{[shortKey, "mileage"]} := allTrips{[shortKey, "mileage"]};
+        //    shortTrips{[shortKey, "time"]} := allTrips{[shortKey, "time"]};
+        //}
+            
+        shortTrips
     }
+
     blank_Trip = {}
     blank_Long_Trip = {}
-    blank_Trip_Counter = {"tripCount": "0" }
-    blank_Long_Trip_Counter = {"tripCount": "0" }
+    blank_Trip_Counter = {"tripCount": 0 }
 
     __testing = { "queries": [ { "name": "returnMessage", "args": [ "message" ] },
                             { "name": "trips", "args": [] },
@@ -48,17 +62,19 @@ rule collect_trips{
     pre{
         messageInput = event:attr("mileage").klog("our passed in input: ")
         timeStamp = time:now()
-        currentTripCount = ent:tripCounter{["tripCount"]}        
-}
+    }
     send_directive("say") with
         mileage = messageInput
         currentTime = timeStamp
     always{
         ent:tripCounter := ent:tripCounter.defaultsTo(blank_Trip_Counter,"initialization was needed");
         ent:trip := ent:trip.defaultsTo(blank_Trip,"initialization was needed");
-        ent:trip{[currentTripCount,"trip", "mileage"]} := messageInput;
-        ent:trip{[currentTripCount,"trip", "time"]} := timeStamp;
-        ent:tripCounter{["tripCount"]} := currentTripCount + 1
+        currentTripCount = ent:tripCounter{["tripCount"]};
+        ent:tripCounter{["tripCount"]} := currentTripCount + 1;
+        currentNewTripCount = ent:tripCounter{["tripCount"]};
+
+        ent:trip{[currentNewTripCount, "mileage"]} := messageInput;
+        ent:trip{[currentNewTripCount, "time"]} := timeStamp
     }
 }
 
@@ -67,20 +83,17 @@ rule collect_trips{
         pre{
             messageInput = event:attr("mileage").klog("our passed in input: ")
             timeStamp = time:now()
-            currentLongTripCount = ent:longTripCounter{["tripCount"]}
-
             }
         send_directive("say") with
             mileage = messageInput
             currentTime = timeStamp
         always{
-            ent:longTripCounter := ent:longTripCounter.defaultsTo(blank_Long_Trip_Counter,"initialization was needed");
+            ent:tripCounter := ent:tripCounter.defaultsTo(blank_Trip_Counter,"initialization was needed");
             ent:longTrip := ent:longTrip.defaultsTo(blank_Long_Trip,"initialization was needed");
+            currentTripCount = ent:tripCounter{["tripCount"]};
 
-
-            ent:longTrip{[currentLongTripCount,"trip", "mileage"]} := messageInput;
-            ent:longTrip{[currentLongTripCount,"trip", "time"]} := timeStamp;
-            ent:longTripCounter{["tripCount"]} := currentLongTripCount + 1
+            ent:longTrip{[currentTripCount, "mileage"]} := messageInput;
+            ent:longTrip{[currentTripCount, "time"]} := timeStamp
         }
     }
 
@@ -89,8 +102,7 @@ rule collect_trips{
         always {
             ent:trip := blank_Trip;
             ent:longTrip := blank_Long_Trip;
-            ent:tripCounter := blank_Trip_Counter;
-            ent:longTripCounter := blank_Long_Trip_Counter
+            ent:tripCounter := blank_Trip_Counter
         }
     }
 

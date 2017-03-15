@@ -46,7 +46,7 @@ ruleset track_trips2{
 
         fired{
                 raise explicit event "found_long_trip"
-                attributes {}
+                attributes {"mileage":messageInput}
                 if messageAsNumber > longTrip
             }
     }
