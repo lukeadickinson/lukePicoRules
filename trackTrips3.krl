@@ -3,6 +3,7 @@ ruleset trip_store{
     name "trip_store"
     author "Luke Dickinson"
     logging on
+    provides trips,long_trips,short_trips
     shares returnMessage,trips,long_trips,short_trips, __testing
   }
   
@@ -50,8 +51,8 @@ ruleset trip_store{
                             { "name": "short_trips", "args": [] },
                            { "name": "__testing" } ],
                 
-              "events": [ { "domain": "explicit", "type": "trip_processed" , "attrs": [ "mileage"]},
-                          { "domain": "explicit", "type": "found_long_trip" , "attrs": [ "mileage"]},
+              "events": [ { "domain": "explicit", "type": "trip_processed" , "attrs": [ "mileage","timestamp"]},
+                          { "domain": "explicit", "type": "found_long_trip" , "attrs": [ "mileage","timestamp"]},
                           { "domain": "car", "type": "trip_reset" , "attrs": []}
                         ]
     }
@@ -61,7 +62,7 @@ rule collect_trips{
     select when explicit trip_processed
     pre{
         messageInput = event:attr("mileage").klog("our passed in input: ")
-        timeStamp = time:now()
+        timeStamp = event:attr("timestamp").klog("timestamp: ")
     }
     send_directive("say") with
         mileage = messageInput
@@ -82,7 +83,7 @@ rule collect_trips{
         select when explicit found_long_trip
         pre{
             messageInput = event:attr("mileage").klog("our passed in input: ")
-            timeStamp = time:now()
+            timeStamp = event:attr("timestamp").klog("timestamp: ")
             }
         send_directive("say") with
             mileage = messageInput

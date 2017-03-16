@@ -14,8 +14,8 @@ ruleset track_trips2{
     __testing = { "queries": [ { "name": "returnMessage", "args": [ "message" ] },
                            { "name": "__testing" } ],
                 
-              "events": [ { "domain": "echo", "type": "message" , "attrs": [ "mileage"]},
-                          { "domain": "explicit", "type": "trip_processed" , "attrs": [ "mileage"]}
+              "events": [ { "domain": "car", "type": "new_trip" , "attrs": [ "mileage"]},
+                          { "domain": "explicit", "type": "trip_processed" , "attrs": [ "mileage","timestamp"]}
                         ]
     }
   }
@@ -25,19 +25,23 @@ ruleset track_trips2{
         select when car new_trip
         pre{
             messageInput = event:attr("mileage").klog("our passed in input: ")
+            timeStamp = time:now()
+
         }
         send_directive("say") with
             trip_length = returnMessage(messageInput)
-        
+            currentTime = timeStamp
         fired{
             raise explicit event "trip_processed"
-            attributes {"mileage":messageInput}
+            attributes {"mileage":messageInput,"timestamp":timeStamp}
         }
     }
     rule find_long_trips{
         select when explicit trip_processed
         pre{
             messageInput = event:attr("mileage").klog("our passed in input: ")
+            timeStamp = event:attr("timestamp").klog("timestamp: ")
+
             longTrip = 10
             messageAsNumber = messageInput.as("Number")
         }
@@ -46,7 +50,7 @@ ruleset track_trips2{
 
         fired{
                 raise explicit event "found_long_trip"
-                attributes {"mileage":messageInput}
+                attributes {"mileage":messageInput,"timestamp":timeStamp}
                 if messageAsNumber > longTrip
             }
     }
