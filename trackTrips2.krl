@@ -2,6 +2,7 @@ ruleset track_trips2{
   meta {
     name "track_trips2"
     author "Luke Dickinson"
+    use module trip_store
     logging on
     shares returnMessage, __testing
   }
@@ -35,6 +36,24 @@ ruleset track_trips2{
             raise explicit event "trip_processed"
             attributes {"mileage":messageInput,"timestamp":timeStamp}
         }
+    }
+    rule requestReport
+    {
+        select when car requestReport
+            pre{
+                parentECI = event:attr("myEci")
+                myID = event:attr("myID")
+                reportID = event:attr("reportID")
+
+                myTrip = trip_store:trips()
+            }
+
+            event:send(
+            { "eci": parentECI, "eid": "requestReport",
+            "domain": "car", "type": "responseReport",
+            "attrs": { "rid": "trip_store", "tripData": myTrip,"myID":myID, "reportID": reportID} } 
+            )
+            
     }
     rule find_long_trips{
         select when explicit trip_processed

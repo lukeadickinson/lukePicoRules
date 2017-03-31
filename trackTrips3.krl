@@ -14,12 +14,12 @@ ruleset trip_store{
 
     trips = function()
     {
-        ent:trip
+        ent:trip || {}
     }
 
     long_trips = function()
     {
-        ent:longTrip
+        ent:longTrip || {}
     }
 
     short_trips = function()
